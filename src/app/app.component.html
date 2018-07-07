@@ -1,20 +1,146 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
 
+<mat-toolbar color="primary" class="menu">
+  <mat-toolbar-row >
+    <!-- <img src="../assets/logo.jpeg" alt=""> -->
+    <!-- <button mat-button><img class="logo" src="../assets/logo.png" alt=""></button> -->
+    <button mat-button>STUDENT BANK</button>
+    <button mat-button><mat-icon class="home">home</mat-icon>Home</button>
+    <button mat-button (click)="openSigninDialog()">Sign In</button>
+    <button mat-button (click)="openSignupDialog()">Sign Up</button>
+    <button mat-button (click)="openAboutDialog()">About</button>
+    <button mat-button (click)="signOut()">Sign Out</button>
+    <!-- <button mat-button><mat-icon>mail_outline</mat-icon>Contact Us</button> -->
+  </mat-toolbar-row>
+</mat-toolbar>
+
+
+<img src="../assets/pic.jpeg" alt="" >
+
+<mat-toolbar>Offered Loans
+    <button *ngIf="loggedInUser" mat-button class="add-offer" (click)="openAddOfferDialog()">Add offer</button>
+</mat-toolbar>
+
+<table 
+  #firstTable
+  #firstTableSort="matSort"
+  mat-table 
+  [dataSource]="offersDataSource" 
+  matSort 
+  class="mat-elevation-z8">
+
+  <ng-container matColumnDef="Username">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Username </th>
+    <td mat-cell *matCellDef="let element"> <a href="#" (click)="openFacebook(element.Username)">{{element.Username}}</a> </td>
+  </ng-container>
+
+  <ng-container matColumnDef="Amount">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+    <td mat-cell *matCellDef="let element"> {{element.Amount}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="Currency">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Currency </th>
+    <td mat-cell *matCellDef="let element"> {{element.Currency}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="Interest">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Interest </th>
+    <td mat-cell *matCellDef="let element"> {{element.Interest}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="button">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+    <td mat-cell *matCellDef="let element; let i = index;"> <button *ngIf="loggedInUser" (click)="openTakeLoanDialog(element, i)" color="primary" mat-button>Take loan!</button></td>
+  </ng-container>
+  
+
+  <ng-container matColumnDef="rate">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+    <td mat-cell *matCellDef="let element"> 
+        <button *ngIf="loggedInUser" color="primary" mat-button  (click)="openRate(element.Username)"> Rate </button>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="Reviews">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Reviews </th>
+    <td mat-cell *matCellDef="let element"> <a *ngIf="loggedInUser" mat-button (click)="openRatesDialog(element.Username)">{{getNumOfRates(element.Username)}} reviews ({{getRatesAverage(element.Username) | number}})</a> </td>
+  </ng-container>
+
+  <ng-container matColumnDef="fb">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> </th>
+    <td mat-cell *matCellDef="let element">
+        <a *ngIf="loggedInUser" color="primary" mat-button></a>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<mat-toolbar>Requested Loans
+    <button *ngIf="loggedInUser" mat-button class="add-offer" (click)="openAddRequestDialog()">Add request</button>
+</mat-toolbar>
+
+<table 
+  #secondTable
+  #secondTableSort="matSort"
+  mat-table 
+  [dataSource]="requestsDataSource" 
+  matSort 
+  class="mat-elevation-z8"
+  >
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="Username">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Username </th>
+    <td mat-cell *matCellDef="let element">  <a href="#" (click)="openFacebook(element.Username)">{{element.Username}}</a> </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="Amount">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+    <td mat-cell *matCellDef="let element"> {{element.Amount}} </td>
+  </ng-container>
+
+  <!-- Weight Column -->
+  <ng-container matColumnDef="Currency">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Currency </th>
+    <td mat-cell *matCellDef="let element"> {{element.Currency}} </td>
+  </ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="Interest">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Interest </th>
+    <td mat-cell *matCellDef="let element"> {{element.Interest}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="button">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+    <td mat-cell *matCellDef="let element;  let i = index;"> <button *ngIf="loggedInUser" (click)="openGiveLoanDialog(element, i)" color="primary" mat-button> Give loan! </button></td>
+  </ng-container>
+
+  <ng-container matColumnDef="rate">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+    <td mat-cell *matCellDef="let element"> 
+        <button *ngIf="loggedInUser" color="primary" mat-button (click)="openRate(element.Username)"> Rate </button>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="Reviews">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Reviews </th>
+    <td mat-cell *matCellDef="let element"> <a  *ngIf="loggedInUser" mat-button (click)="openRatesDialog(element.Username)">{{getNumOfRates(element.Username)}} reviews ({{getRatesAverage(element.Username) | number}})</a> </td>
+  </ng-container>
+
+  <ng-container matColumnDef="fb">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+    <td mat-cell *matCellDef="let element"> 
+        <a *ngIf="loggedInUser" color="primary" mat-button> </a>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<mat-toolbar></mat-toolbar>
+<mat-toolbar calss="footer" color="primary"><mat-icon>copyright</mat-icon><pre> </pre> Amit Dahan, Yael Hochma, Shahar Barel, Eliran Nachmani, Nitzan Masad</mat-toolbar>
